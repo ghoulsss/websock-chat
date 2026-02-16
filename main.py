@@ -26,6 +26,7 @@ app.add_middleware(
 app.include_router(users_router)
 app.include_router(chat_router)
 
+
 @app.get("/health")
 async def health():
     return await test_db()

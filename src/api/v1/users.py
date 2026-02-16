@@ -14,12 +14,13 @@ from src.dao.users import UsersDAO
 from src.schemas.user import SUserRegister, SUserAuth
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
-templates = Jinja2Templates(directory='src/templates')
+templates = Jinja2Templates(directory="src/templates")
 
 
 @router.get("/", response_class=HTMLResponse, summary="Страница авторизации")
 async def get_categories(request: Request):
     return templates.TemplateResponse("auth.html", {"request": request})
+
 
 @router.post("/register/")
 async def register_user(user_data: SUserRegister) -> dict:
