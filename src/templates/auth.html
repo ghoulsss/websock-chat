@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Chat — Вход</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', path='styles/styles.css') }}">
+</head>
+<body>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+
+        <h1 class="logo">💬 Mini Chat</h1>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="login">Авторизация</button>
+            <button class="tab" data-tab="register">Регистрация</button>
+        </div>
+
+        <div class="content">
+
+            <form id="loginForm" class="form active">
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" placeholder="example@mail.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Пароль</label>
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+
+                <button id="loginButton" type="submit" class="primary-btn">
+                    Войти
+                </button>
+            </form>
+
+            <!-- REGISTER -->
+            <form id="registerForm" class="form">
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" placeholder="example@mail.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Имя</label>
+                    <input type="text" placeholder="Ваше имя" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Пароль</label>
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Повторите пароль</label>
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+
+                <button id="registerButton" type="submit" class="primary-btn">
+                    Зарегистрироваться
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', path='js/test.js') }}"></script>
+</body>
+</html>
