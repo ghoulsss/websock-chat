@@ -1,12 +1,13 @@
-from sqlalchemy import String, Integer
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
-from src.db.models.base import Base
+
+from db.models.mixins import UpdatedAtMixin, CreatedAtMixin, IDMixin
+from src.db.models.base import BaseModel
 
 
-class User(Base):
+class User(BaseModel, IDMixin, CreatedAtMixin, UpdatedAtMixin):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, nullable=False)

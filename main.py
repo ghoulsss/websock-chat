@@ -1,15 +1,13 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import RedirectResponse
-from starlette.staticfiles import StaticFiles
+from fastapi.staticfiles import StaticFiles
 
 from src.api.v1.users import router as users_router
 from src.api.v1.chat import router as chat_router
-from src.exceptions.auth import TokenExpiredException, TokenNoFoundException
-# from fastapi.responses import HTMLResponse
-# from fastapi.templating import Jinja2Templates
+from src.api.v1.home import router as home_router
+from src.api.v1.socket import router as socket_router
+from src.api.v1.messages import router as messages_router
 
-from src.db.session import test_db
 
 app = FastAPI()
 
@@ -25,26 +23,6 @@ app.add_middleware(
 
 app.include_router(users_router)
 app.include_router(chat_router)
-
-
-@app.get("/health")
-async def health():
-    return await test_db()
-
-
-@app.get("/")
-async def redirect_to_auth():
-    return RedirectResponse(url="/auth")
-
-
-@app.exception_handler(TokenExpiredException)
-async def token_expired_exception_handler(request: Request, exc: HTTPException):
-    # Возвращаем редирект на страницу /auth
-    return RedirectResponse(url="/auth")
-
-
-# Обработчик для TokenNoFound
-@app.exception_handler(TokenNoFoundException)
-async def token_no_found_exception_handler(request: Request, exc: HTTPException):
-    # Возвращаем редирект на страницу /auth
-    return RedirectResponse(url="/auth")
+app.include_router(home_router)
+app.include_router(socket_router)
+app.include_router(messages_router)

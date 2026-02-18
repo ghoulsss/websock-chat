@@ -1,10 +1,17 @@
-from sqlalchemy import func
-from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
-from datetime import datetime
+from sqlalchemy import MetaData
+from sqlalchemy.orm import DeclarativeBase, declarative_mixin
 
 
-class Base(DeclarativeBase):
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), onupdate=func.now()
-    )
+@declarative_mixin
+class BaseModel(DeclarativeBase): ...
+
+
+POSTGRES_INDEXES_NAMING_CONVENTION = {
+    "ix": "%(column_0_label)s_idx",
+    "uq": "%(table_name)s_%(column_0_name)s_key",
+    "ck": "%(table_name)s_%(constraint_name)s_check",
+    "fk": "%(table_name)s_%(column_0_name)s_fkey",
+    "pk": "%(table_name)s_pkey",
+}
+
+BaseModel.metadata = MetaData(naming_convention=POSTGRES_INDEXES_NAMING_CONVENTION)

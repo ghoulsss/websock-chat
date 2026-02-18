@@ -254,3 +254,4 @@ poetry.toml
 .venv/
 
 .python-version
+/.vscode/settings.json

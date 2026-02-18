@@ -22,7 +22,7 @@ async def get_categories(request: Request):
     return templates.TemplateResponse("auth.html", {"request": request})
 
 
-@router.post("/register/")
+@router.post("/register")
 async def register_user(user_data: SUserRegister) -> dict:
     user = await UsersDAO.find_one_or_none(email=user_data.email)
     if user:
@@ -38,7 +38,7 @@ async def register_user(user_data: SUserRegister) -> dict:
     return {"message": "Вы успешно зарегистрированы!"}
 
 
-@router.post("/login/")
+@router.post("/login")
 async def auth_user(response: Response, user_data: SUserAuth):
     check = await authenticate_user(email=user_data.email, password=user_data.password)
     if check is None:
@@ -53,7 +53,7 @@ async def auth_user(response: Response, user_data: SUserAuth):
     }
 
 
-@router.post("/logout/")
+@router.post("/logout")
 async def logout_user(response: Response):
     response.delete_cookie(key="users_access_token")
     return {"message": "Пользователь успешно вышел из системы"}

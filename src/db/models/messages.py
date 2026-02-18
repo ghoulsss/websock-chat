@@ -1,12 +1,13 @@
 from sqlalchemy import Integer, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
-from src.db.models.base import Base
+
+from db.models.mixins import IDMixin, CreatedAtMixin, UpdatedAtMixin
+from src.db.models.base import BaseModel
 
 
-class Message(Base):
+class Message(BaseModel, IDMixin, CreatedAtMixin, UpdatedAtMixin):
     __tablename__ = "messages"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     sender_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     recipient_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     content: Mapped[str] = mapped_column(Text)

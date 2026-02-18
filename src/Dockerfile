@@ -1,6 +1,6 @@
 FROM python:3.12-bullseye
 
-WORKDIR /usr/grade/src
+WORKDIR /usr/websock/src
 
 ENV PYTHONUNBUFFERED=1 \
     TZ="Europe/Moscow"

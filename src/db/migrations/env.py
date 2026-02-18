@@ -1,34 +1,35 @@
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+import db.models
 from core.config import settings
-from db.models.base import Base
-from alembic import context
 
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
 config = context.config
 config.set_main_option("sqlalchemy.url", settings().postgres_dsn)
-##
-from app.config import settings
 
-# Добавьте перед config.set_main_option
-print("DEBUG: Loading settings...")
-s = settings()
-print(f"DEBUG: SECRET_KEY exists: {hasattr(s, 'SECRET_KEY')}")
-print(f"DEBUG: ALGORITHM exists: {hasattr(s, 'ALGORITHM')}")
-print(f"DEBUG: POSTGRES_USER: {s.POSTGRES_USER}")
-print(f"DEBUG: Database DSN: {s.postgres_dsn}")
 
-config.set_main_option("sqlalchemy.url", s.postgres_dsn)
-##
-
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = Base.metadata
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
+target_metadata = db.models.base.BaseModel.metadata
+
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
 
 
 def run_migrations_offline() -> None:
