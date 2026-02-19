@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from db.models.mixins import IDMixin, CreatedAtMixin, UpdatedAtMixin
+from src.db.models.mixins import IDMixin, CreatedAtMixin, UpdatedAtMixin
 from src.db.models.base import BaseModel
 
 

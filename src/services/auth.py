@@ -1,42 +1,42 @@
-from passlib.context import CryptContext
-from pydantic import EmailStr
-from jose import jwt
-from datetime import datetime, timedelta, timezone
+from fastapi import Depends
 
-from src.core.config import get_auth_data
-from src.dao.users import UsersDAO
-
-
-def create_access_token(data: dict) -> str:
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(days=366)
-    to_encode.update({"exp": expire})
-    auth_data = get_auth_data()
-    encode_jwt = jwt.encode(
-        to_encode, auth_data["secret_key"], algorithm=auth_data["algorithm"]
-    )
-    return encode_jwt
+from src.exceptions.auth import IncorrectEmailOrPasswordException
+from src.db.repositories.user import UserRepository
+from src.exceptions.auth import UserAlreadyExistsException
+from src.schemas.user import SUserRegister, SUserAuth, SUser
+from src.utils.auth import create_access_token, get_password_hash
+from src.utils.auth import verify_password
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+class AuthService:
+    def __init__(self, user_repository: UserRepository = Depends()):
+        self._user_repository = user_repository
 
+    async def register_user(self, user_data: SUserRegister):
+        if user_data.password != user_data.password_check:
+            raise ValueError("Passwords do not match")
 
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+        existing_user = await self._user_repository.get_user_by_email(user_data.email)
+        if existing_user:
+            raise UserAlreadyExistsException(f"User with email {user_data.email} already exists")
 
+        hashed_password = get_password_hash(user_data.password)
+        user = await self._user_repository.create_user(user_data, hashed_password)
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+        access_token = create_access_token({"sub": str(user.id)})
 
+        return {"access_token": access_token, "user": user}
 
-async def authenticate_user(email: EmailStr, password: str):
-    user = await UsersDAO.find_one_or_none(email=email)
-    if (
-        not user
-        or verify_password(
-            plain_password=password, hashed_password=user.hashed_password
-        )
-        is False
-    ):
-        return None
-    return user
+    async def login_user(self, auth_data: SUserAuth):
+        user = await self._authenticate_user(auth_data.email, auth_data.password)
+        if not user:
+            raise IncorrectEmailOrPasswordException
+
+        access_token = create_access_token({"sub": str(user.id)})
+        return {"access_token": access_token, "user": SUser.model_validate(user)}
+
+    async def _authenticate_user(self, email: str, password: str):
+        user = await self._user_repository.get_user_by_email(email)
+        if not user or not verify_password(password, user.hashed_password):
+            return None
+        return user

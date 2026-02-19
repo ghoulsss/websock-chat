@@ -2,6 +2,7 @@ from fastapi import Request, HTTPException, status, Depends
 from jose import jwt, JWTError
 from datetime import datetime, timezone
 
+from src.db.repositories.user import UserRepository
 from src.core.config import get_auth_data
 from src.exceptions.auth import (
     TokenExpiredException,
@@ -9,7 +10,6 @@ from src.exceptions.auth import (
     NoUserIdException,
     TokenNoFoundException,
 )
-from src.dao.users import UsersDAO
 
 
 def get_token(request: Request):
@@ -37,7 +37,7 @@ async def get_current_user(token: str = Depends(get_token)):
     if not user_id:
         raise NoUserIdException
 
-    user = await UsersDAO.find_one_or_none_by_id(int(user_id))
+    user = await  UserRepository.get_user_by_id(int(user_id))
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"

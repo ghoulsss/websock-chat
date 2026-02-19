@@ -24,5 +24,5 @@ class UpdatedAtMixin:
     __abstract__ = True
 
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), onupdate=func.now(), nullable=True
+        DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=True
     )
