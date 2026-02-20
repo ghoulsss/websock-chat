@@ -63,3 +63,7 @@ async def auth_user(
 async def logout_user(response: Response):
     response.delete_cookie(key="users_access_token")
     return {"message": "Пользователь успешно вышел из системы"}
+
+@router.post("/protected")
+async def logout_user(user: str = Depends(AuthService.get_current_user)):
+    return {"message": f"Пользователь {user}"}
