@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from fastapi import Request, HTTPException, status, Depends
 from jose import jwt, JWTError
 
+from src.dependencies.auth import get_token
 from src.core.config import get_auth_data
 from src.exceptions.auth import TokenExpiredException, NoUserIdException, TokenNoFoundException, NoJwtException
 from src.exceptions.auth import IncorrectEmailOrPasswordException
@@ -33,25 +34,13 @@ class AuthService:
         return {"access_token": access_token, "user": user}
 
     async def login_user(self, auth_data: SUserAuth):
-        user = await self._authenticate_user(auth_data.email, auth_data.password)
-        if not user:
-            raise IncorrectEmailOrPasswordException
+        user = await self._user_repository.get_user_by_email(auth_data.email)
+        if not user or not verify_password(auth_data.password, user.hashed_password):
+            return IncorrectEmailOrPasswordException
 
         access_token = create_access_token({"sub": str(user.id)})
         return {"access_token": access_token, "user": SUser.model_validate(user)}
 
-    async def _authenticate_user(self, email: str, password: str):
-        user = await self._user_repository.get_user_by_email(email)
-        if not user or not verify_password(password, user.hashed_password):
-            return None
-        return user
-
-    @staticmethod
-    def get_token(request: Request):
-        token = request.cookies.get("users_access_token")
-        if not token:
-            raise TokenNoFoundException
-        return token
 
     async def get_current_user(self, token: str = Depends(get_token)):
         try:

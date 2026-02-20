@@ -29,7 +29,6 @@ async def register_user(
     except ValueError:
         raise PasswordMismatchException("Пароли не совпадают")
     except Exception as e:
-        print(e)
         raise UserAlreadyExistsException
 
     return {
