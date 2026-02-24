@@ -11,12 +11,14 @@ class TokenNoFoundException(HTTPException):
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Токен не найден"
         )
+
+
 class IncorrectEmailOrPasswordException(HTTPException):
     def __init__(self):
         super().__init__(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Неверная почта или пароль"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверная почта или пароль"
         )
+
 
 UserAlreadyExistsException = HTTPException(
     status_code=status.HTTP_409_CONFLICT, detail="Пользователь уже существует"
@@ -41,4 +43,3 @@ NoUserIdException = HTTPException(
 ForbiddenException = HTTPException(
     status_code=status.HTTP_403_FORBIDDEN, detail="Недостаточно прав!"
 )
-

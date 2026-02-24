@@ -9,7 +9,7 @@ from src.exceptions.auth import (
     IncorrectEmailOrPasswordException,
     PasswordMismatchException,
 )
-from src.schemas.user import SUserRegister, SUserAuth
+from src.schemas.user import CreateUserSchema, AuthUserSchema
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 templates = Jinja2Templates(directory="src/templates")
@@ -22,13 +22,13 @@ async def get_auth_page(request: Request):
 
 @router.post("/register")
 async def register_user(
-    user_data: SUserRegister, auth_service: AuthService = Depends()
+    user_data: CreateUserSchema, auth_service: AuthService = Depends()
 ) -> dict:
     try:
         result = await auth_service.register_user(user_data)
     except ValueError:
         raise PasswordMismatchException("Пароли не совпадают")
-    except Exception as e:
+    except Exception:
         raise UserAlreadyExistsException
 
     return {
@@ -40,7 +40,7 @@ async def register_user(
 
 @router.post("/login")
 async def auth_user(
-    response: Response, user_data: SUserAuth, auth_service: AuthService = Depends()
+    response: Response, user_data: AuthUserSchema, auth_service: AuthService = Depends()
 ):
     try:
         result = await auth_service.login_user(user_data)
@@ -63,6 +63,7 @@ async def auth_user(
 async def logout_user(response: Response):
     response.delete_cookie(key="users_access_token")
     return {"message": "Пользователь успешно вышел из системы"}
+
 
 @router.post("/protected")
 async def logout_user(user: str = Depends(AuthService.get_current_user)):

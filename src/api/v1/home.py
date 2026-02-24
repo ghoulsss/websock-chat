@@ -1,7 +1,6 @@
-from fastapi import Request, HTTPException, APIRouter
+from fastapi import APIRouter
 from starlette.responses import RedirectResponse
 
-from src.exceptions.auth import TokenExpiredException, TokenNoFoundException
 from src.db.session import test_db
 
 router = APIRouter(prefix="/home", tags=["home"])

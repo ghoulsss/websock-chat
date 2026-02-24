@@ -1,40 +1,61 @@
 from typing import Sequence
 
+from fastapi import HTTPException
+from fastapi.params import Depends
 from pydantic import EmailStr
 
-from db.repositories.user import UserRepository
-from schemas.user import SUserRegister, SUser
-from utils.auth import get_password_hash, authenticate_user, create_access_token
+from src.db.repositories.user import UserRepository
+from src.schemas.user import CreateUserSchema, BaseUserSchema
+from src.utils.auth import get_password_hash
 
 
 class UserService:
-    def __init__(self, repository: UserRepository):
-        self.repository = repository
+    def __init__(
+        self,
+        user_repository: UserRepository = Depends(),
+    ) -> None:
+        self.user_repository = user_repository
 
-    async def create_user(self, user_data: SUserRegister) -> SUser:
+    async def create_user(self, user_data: CreateUserSchema) -> BaseUserSchema:
         hashed_password = get_password_hash(user_data.password)
-        user = await self.repository.create_user(user_data, hashed_password)
+        user = await self.user_repository.create_user(user_data, hashed_password)
         return user
 
-    async def get_user_by_id(self, user_id: int) -> SUser | None:
-        return await self.repository.get_user_by_id(user_id)
+    async def get_user_by_id(self, user_id: int) -> BaseUserSchema | None:
+        user = await self.user_repository.get_user_by_id(user_id)
 
-    async def get_user_by_email(self, user_id: int) -> SUser | None:
-        return await self.repository.get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
 
-    async def get_all_users(self) -> Sequence[SUser]:
-        return await self.repository.get_all_users()
+        return user
 
-    async def list_users(self) -> Sequence[SUser]:
-        return await self.repository.get_all_users()
+    async def get_user_by_email(self, email: EmailStr) -> BaseUserSchema | None:
+        user = await self.user_repository.get_user_by_email(email)
+
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        return BaseUserSchema.model_validate(user) if user else None
+
+    async def get_all_users(self) -> Sequence[BaseUserSchema]:
+        return await self.user_repository.get_all_users()
+
+    async def list_users(self) -> Sequence[BaseUserSchema]:
+        return await self.user_repository.get_all_users()
 
     async def update_user(self, user_id: int, update_data: dict) -> None:
+        user = await self.get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
         if "password" in update_data:
-            update_data["hashed_password"] = get_password_hash(update_data.pop("password"))
-        await self.repository.update_user(user_id, update_data)
+            update_data["hashed_password"] = get_password_hash(
+                update_data.pop("password")
+            )
+        await self.user_repository.update_user(user_id, update_data)
 
     async def delete_user(self, user_id: int) -> None:
-        await self.repository.delete_user(user_id)
+        await self.user_repository.delete_user(user_id)
 
     async def delete_all_users(self) -> None:
-        await self.repository.delete_all()
+        await self.user_repository.delete_all()

@@ -11,6 +11,8 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str = "websocket-chat-test"
 
+    USE_CORS_MIDDLEWARE: bool = True
+
     SERVER_HOST: str = "0.0.0.0"
     SERVER_PORT: int = 8000
     # SERVER_WORKERS_COUNT: int = 5

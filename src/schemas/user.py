@@ -2,7 +2,7 @@ from pydantic import EmailStr, Field
 from src.schemas.base import BaseSchema
 
 
-class SUserRegister(BaseSchema):
+class CreateUserSchema(BaseSchema):
     email: EmailStr = Field(..., description="Электронная почта")
     password: str = Field(
         ..., min_length=5, max_length=30, description="Пароль, от 5 до 30 знаков"
@@ -15,13 +15,20 @@ class SUserRegister(BaseSchema):
     )
 
 
-class SUserAuth(BaseSchema):
+class AuthUserSchema(BaseSchema):
     email: EmailStr = Field(..., description="Электронная почта")
     password: str = Field(
         ..., min_length=5, max_length=30, description="Пароль, от 5 до 30 знаков"
     )
 
-class SUser(BaseSchema):
+
+class BaseUserSchema(BaseSchema):
     id: int
     name: str
     email: EmailStr
+
+
+class UpdateUserSchema(BaseSchema):
+    name: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
