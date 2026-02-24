@@ -36,7 +36,6 @@ class AuthService:
         user = await self._user_repository.create_user(user_data, hashed_password)
 
         access_token = create_access_token({"sub": str(user.id)})
-
         return {"access_token": access_token, "user": user}
 
     async def login_user(self, auth_data: AuthUserSchema):

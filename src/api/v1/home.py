@@ -11,6 +11,6 @@ async def health():
     return await test_db()
 
 
-@router.get("/")
-async def redirect_to_auth():
-    return RedirectResponse(url="/auth")
+# @router.get("/")
+# async def redirect_to_auth():
+#     return RedirectResponse(url="/auth")

@@ -88,7 +88,7 @@ document
 		});
 
 		if (data) {
-			window.location.href = "/chat";
+			window.location.href = "/chat/";
 		}
 	});
 
