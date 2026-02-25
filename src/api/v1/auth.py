@@ -65,6 +65,14 @@ async def logout_user(response: Response):
     return {"message": "Пользователь успешно вышел из системы"}
 
 
-@router.post("/protected")
-async def logout_user(user: str = Depends(AuthService.get_current_user)):
-    return {"message": f"Пользователь {user}"}
+# @router.get("/protected")
+# async def protected_route(
+#     request: Request,
+#     auth_service: AuthService = Depends(),
+# ):
+#     user_data = await auth_service.get_current_user()
+#     return {
+#         "request": request,
+#         "user": user_data,
+#         "authenticated": True,
+#     }

@@ -44,4 +44,4 @@ async def test_db():
     engine = get_engine()
     async with engine.connect() as conn:
         result = await conn.execute(text("SELECT 1"))
-        print(result.scalar())
+        return result.scalar()
