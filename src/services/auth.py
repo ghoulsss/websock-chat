@@ -73,13 +73,3 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
             )
         return user
-
-# def get_auth_service(
-#     user_repository: UserRepository = Depends(UserRepository),
-# ) -> AuthService:
-#     return AuthService(user_repository)
-#
-# async def get_current_user(
-#     auth_service: AuthService = Depends(get_auth_service),
-# ):
-#     return await auth_service.get_current_user()

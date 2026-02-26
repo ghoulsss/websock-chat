@@ -15,9 +15,9 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 templates = Jinja2Templates(directory="src/templates")
 
 
-@router.get("/", response_class=HTMLResponse, summary="Страница авторизации")
-async def get_auth_page(request: Request):
-    return templates.TemplateResponse("auth.html", {"request": request})
+# @router.get("/", response_class=HTMLResponse, summary="Страница авторизации")
+# async def get_auth_page(request: Request):
+#     return templates.TemplateResponse("login.html", {"request": request})
 
 
 @router.post("/register")
@@ -40,7 +40,7 @@ async def register_user(
 
 @router.post("/login")
 async def auth_user(
-    response: Response, user_data: AuthUserSchema, auth_service: AuthService = Depends()
+    user_data: AuthUserSchema, auth_service: AuthService = Depends()
 ):
     try:
         result = await auth_service.login_user(user_data)
@@ -48,31 +48,9 @@ async def auth_user(
         raise IncorrectEmailOrPasswordException
 
     access_token = result["access_token"]
-    response.set_cookie(key="users_access_token", value=access_token, httponly=True)
 
     return {
-        "ok": True,
         "access_token": access_token,
-        "refresh_token": None,
-        "message": "Авторизация успешна!",
+        # "refresh_token": None,
         "user": result["user"],
     }
-
-
-@router.post("/logout")
-async def logout_user(response: Response):
-    response.delete_cookie(key="users_access_token")
-    return {"message": "Пользователь успешно вышел из системы"}
-
-
-# @router.get("/protected")
-# async def protected_route(
-#     request: Request,
-#     auth_service: AuthService = Depends(),
-# ):
-#     user_data = await auth_service.get_current_user()
-#     return {
-#         "request": request,
-#         "user": user_data,
-#         "authenticated": True,
-#     }

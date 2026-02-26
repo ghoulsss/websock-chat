@@ -1,14 +1,13 @@
-from pydantic import Field
-from src.schemas.base import BaseSchema
-
-
-class MessageRead(BaseSchema):
-    id: int = Field(..., description="Уникальный идентификатор сообщения")
-    sender_id: int = Field(..., description="ID отправителя сообщения")
-    recipient_id: int = Field(..., description="ID получателя сообщения")
-    content: str = Field(..., description="Содержимое сообщения")
+from datetime import datetime
+from schemas.base import BaseSchema
 
 
 class MessageCreate(BaseSchema):
-    recipient_id: int = Field(..., description="ID получателя сообщения")
-    content: str = Field(..., description="Содержимое сообщения")
+    content: str
+
+
+class MessageOut(MessageCreate):
+    id: int
+    user_id: int
+    username: str
+    created_at: datetime

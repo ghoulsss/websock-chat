@@ -1,50 +1,69 @@
-import asyncio
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
-# from typing import Dict
-#
-# from sqlalchemy.ext.asyncio import AsyncSession
-#
-# from src.db.models.chat import Message
-# from src.db.session import get_session
-# from websocket.manager import manager
-# from src.services.auth import AuthService
+from fastapi import APIRouter, WebSocket, Depends, Request
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from src.db.models import User, Message
 
-router = APIRouter(prefix="/ws", tags=["WS"])
+from src.db.session import get_session
+from src.dependencies.current_user import get_current_user_ws
+from src.websocket.manager import manager
 
-#
-# @router.websocket("/ws/chat/{chat_id}")
-# async def websocket_endpoint(websocket: WebSocket, chat_id: int, auth_repository: AuthService = Depends(), session: AsyncSession = Depends(get_session)):
-#     token = websocket.query_params.get("token")
-#
-#     user = await auth_repository.get_current_user(token)
-#
-#     await manager.connect(chat_id, websocket)
-#
-#     try:
-#         while True:
-#             data = await websocket.receive_json()
-#
-#             message = Message(
-#                 chat_id=chat_id,
-#                 user_id=user.id,
-#                 content=data["content"]
-#             )
-#             session.add(message)
-#             await session.commit()
-#             await session.refresh(message)
-#
-#             await manager.broadcast(chat_id, {
-#                 "user_id": user.id,
-#                 "content": message.content,
-#                 "created_at": str(message.created_at)
-#             })
-#
-#     except WebSocketDisconnect:
-#         manager.disconnect(chat_id, websocket)
+router = APIRouter()
 
 
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Вы сказали: {data}")
+@router.websocket("/ws/chat")
+async def chat_websocket(
+    websocket: WebSocket,
+    session: AsyncSession = Depends(get_session),
+):
+    user: User = await get_current_user_ws(websocket, session)
+
+    if not user:
+        return
+
+    await manager.connect(websocket)
+
+    result = await session.execute(
+        select(Message)
+        .order_by(Message.created_at.desc())
+        .limit(50)
+    )
+    messages = result.scalars().all()
+    messages.reverse()
+
+    for msg in messages:
+        await websocket.send_json({
+            "id": msg.id,
+            "user_id": msg.user_id,
+            "user": msg.user.name,
+            "content": msg.content,
+            "created_at": msg.created_at.isoformat(),
+        })
+
+    try:
+        while True:
+            data = await websocket.receive_json()
+            content = data.get("content")
+
+            if not content:
+                continue
+
+            new_message = Message(
+                user_id=user.id,
+                content=content,
+            )
+            session.add(new_message)
+            await session.commit()
+            await session.refresh(new_message)
+
+            message_data = {
+                "id": new_message.id,
+                "user_id": user.id,
+                "username": user.name,
+                "content": new_message.content,
+                "created_at": new_message.created_at.isoformat(),
+            }
+
+            await manager.broadcast(message_data)
+
+    except Exception:
+        manager.disconnect(websocket)
