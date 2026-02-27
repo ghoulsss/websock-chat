@@ -1,6 +1,4 @@
-from fastapi import APIRouter, Depends, Response
-from fastapi.requests import Request
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Depends
 from starlette.templating import Jinja2Templates
 
 from src.services.auth import AuthService
@@ -12,12 +10,6 @@ from src.exceptions.auth import (
 from src.schemas.user import CreateUserSchema, AuthUserSchema
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
-templates = Jinja2Templates(directory="src/templates")
-
-
-# @router.get("/", response_class=HTMLResponse, summary="Страница авторизации")
-# async def get_auth_page(request: Request):
-#     return templates.TemplateResponse("login.html", {"request": request})
 
 
 @router.post("/register")

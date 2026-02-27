@@ -18,7 +18,7 @@ app = FastAPI(
 
 app.include_router(v1_router)
 
-app.mount("/static", StaticFiles(directory="src/static"), name="static")
+# app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 
 @app.exception_handler(TokenExpiredException)

@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # SERVER_WORKERS_COUNT: int = 5
 
     ENVIRONMENT: str = "local"
-    CORS_ALLOW_ORIGIN_LIST: str = "*"
+    CORS_ALLOW_ORIGIN_LIST: str = "http://localhost:5173"
 
     POSTGRES_HOST: str = ""
     POSTGRES_PORT: int = 5432
