@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, Depends, Request
+from fastapi import APIRouter, WebSocket, Depends, Request, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from src.db.models import User, Message
@@ -7,7 +7,7 @@ from src.db.session import get_session
 from src.dependencies.current_user import get_current_user_ws
 from src.websocket.manager import manager
 
-router = APIRouter()
+router = APIRouter(prefix="", tags=["Websocket"])
 
 
 @router.websocket("/ws/chat")
@@ -34,7 +34,7 @@ async def chat_websocket(
         await websocket.send_json({
             "id": msg.id,
             "user_id": msg.user_id,
-            "user": msg.user.name,
+            "name": msg.user.name,
             "content": msg.content,
             "created_at": msg.created_at.isoformat(),
         })
@@ -58,7 +58,7 @@ async def chat_websocket(
             message_data = {
                 "id": new_message.id,
                 "user_id": user.id,
-                "username": user.name,
+                "name": user.name,
                 "content": new_message.content,
                 "created_at": new_message.created_at.isoformat(),
             }

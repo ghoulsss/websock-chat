@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from starlette.templating import Jinja2Templates
 
 from src.services.auth import AuthService
@@ -37,12 +37,16 @@ async def auth_user(
     try:
         result = await auth_service.login_user(user_data)
     except IncorrectEmailOrPasswordException:
-        raise IncorrectEmailOrPasswordException
+        # raise IncorrectEmailOrPasswordException
+        raise HTTPException(
+            status_code=401,
+            detail="Неверный email или пароль",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     access_token = result["access_token"]
 
     return {
         "access_token": access_token,
-        # "refresh_token": None,
         "user": result["user"],
     }

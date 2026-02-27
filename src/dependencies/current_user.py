@@ -8,7 +8,7 @@ from src.db.models import User
 
 
 async def get_current_user_ws(websocket: WebSocket, db: AsyncSession):
-    token = websocket.query_params.get("users_access_token")
+    token = websocket.query_params.get("access_token")
 
     if not token:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
@@ -16,8 +16,9 @@ async def get_current_user_ws(websocket: WebSocket, db: AsyncSession):
 
     try:
         payload = jwt.decode(token, settings().SECRET_KEY, algorithms=[settings().ALGORITHM])
-        user_id: int = payload.get("sub")
-    except JWTError:
+
+        user_id: int = int(payload.get("sub"))
+    except JWTError as e:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
