@@ -1,5 +1,5 @@
 from pydantic import EmailStr, Field
-from src.schemas.base import BaseSchema
+from schemas.base import BaseSchema
 
 
 class CreateUserSchema(BaseSchema):

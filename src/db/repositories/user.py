@@ -2,9 +2,9 @@ from typing import Sequence
 
 from sqlalchemy import Delete, select, update
 
-from src.db.repositories.base import BaseDatabaseRepository
-from src.schemas.user import CreateUserSchema, BaseUserSchema
-from src.db.models import User
+from db.repositories.base import BaseDatabaseRepository
+from schemas.user import CreateUserSchema, BaseUserSchema
+from db.models import User
 
 
 class UserRepository(BaseDatabaseRepository):

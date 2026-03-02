@@ -1,12 +1,12 @@
 from fastapi import Depends
 
 # from src.dependencies.auth import get_token
-from src.exceptions.auth import IncorrectEmailOrPasswordException
-from src.db.repositories.user import UserRepository
-from src.exceptions.auth import UserAlreadyExistsException
-from src.schemas.user import CreateUserSchema, AuthUserSchema, BaseUserSchema
-from src.utils.auth import create_access_token, get_password_hash
-from src.utils.auth import verify_password
+from exceptions.auth import IncorrectEmailOrPasswordException
+from db.repositories.user import UserRepository
+from exceptions.auth import UserAlreadyExistsException
+from schemas.user import CreateUserSchema, AuthUserSchema, BaseUserSchema
+from utils.auth import create_access_token, get_password_hash
+from utils.auth import verify_password
 
 
 class AuthService:

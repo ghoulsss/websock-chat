@@ -3,8 +3,8 @@ from jose import jwt, JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from src.core.config import settings
-from src.db.models import User
+from core.config import settings
+from db.models import User
 
 
 async def get_current_user_ws(websocket: WebSocket, db: AsyncSession):

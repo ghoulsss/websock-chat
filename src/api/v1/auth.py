@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from src.services.auth import AuthService
-from src.exceptions.auth import (
+from services.auth import AuthService
+from exceptions.auth import (
     UserAlreadyExistsException,
     IncorrectEmailOrPasswordException,
     PasswordMismatchException,
 )
-from src.schemas.user import CreateUserSchema, AuthUserSchema
+from schemas.user import CreateUserSchema, AuthUserSchema
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

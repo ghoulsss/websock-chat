@@ -1,8 +1,8 @@
 from sqlalchemy import Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.db.models.mixins import IDMixin, CreatedAtMixin, UpdatedAtMixin
-from src.db.models.base import BaseModel
+from db.models.mixins import IDMixin, CreatedAtMixin, UpdatedAtMixin
+from db.models.base import BaseModel
 
 
 class Message(BaseModel, IDMixin, CreatedAtMixin, UpdatedAtMixin):

@@ -1,7 +1,7 @@
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 
-from src.core.config import settings
+from core.config import settings
 
 
 middleware = []

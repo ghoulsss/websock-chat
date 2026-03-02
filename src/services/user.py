@@ -4,9 +4,9 @@ from fastapi import HTTPException
 from fastapi.params import Depends
 from pydantic import EmailStr
 
-from src.db.repositories.user import UserRepository
-from src.schemas.user import CreateUserSchema, BaseUserSchema
-from src.utils.auth import get_password_hash
+from db.repositories.user import UserRepository
+from schemas.user import CreateUserSchema, BaseUserSchema
+from utils.auth import get_password_hash
 
 
 class UserService:

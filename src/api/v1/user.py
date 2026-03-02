@@ -1,9 +1,9 @@
 from typing import Sequence
 from fastapi import APIRouter, Depends, status
 
-from src.schemas.user import UpdateUserSchema
-from src.services.user import UserService
-from src.schemas.user import BaseUserSchema, CreateUserSchema
+from schemas.user import UpdateUserSchema
+from services.user import UserService
+from schemas.user import BaseUserSchema, CreateUserSchema
 
 router = APIRouter(prefix="/users", tags=["Users"])
 

@@ -2,10 +2,10 @@ from fastapi import FastAPI, HTTPException
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from src.api.router import v1_router
-from src.core.config import settings
-from src.exceptions.auth import TokenNoFoundException, TokenExpiredException
-from src.core.middlewares import middleware
+from api.router import v1_router
+from core.config import settings
+from exceptions.auth import TokenNoFoundException, TokenExpiredException
+from core.middlewares import middleware
 import uvicorn
 
 

@@ -4,11 +4,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from starlette.websockets import WebSocketDisconnect
 
-from src.db.models import User, Message
+from db.models import User, Message
 
-from src.db.session import get_session
-from src.dependencies.current_user import get_current_user_ws
-from src.websocket.manager import manager
+from db.session import get_session
+from dependencies.current_user import get_current_user_ws
+from websocket.manager import manager
 import logging
 
 logger = logging.getLogger(__name__)
