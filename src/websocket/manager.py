@@ -18,8 +18,9 @@ class ConnectionManager:
 
         for connection in self.active_connections:
             try:
-                await connection.send_json(message)  # ⚡ JSON вместо send_text
-            except:
+                await connection.send_json(message)
+            except Exception as e:
+                print(f"Error sending to client: {e}")
                 disconnected.append(connection)
 
         for conn in disconnected:
