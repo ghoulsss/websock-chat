@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
 from src.api.v1.auth import router as auth_router
-from src.api.v1.chat import router as chat_router
 from src.api.v1.socket import router as socket_router
 from src.api.v1.user import router as user_router
 # from src.core.config import settings

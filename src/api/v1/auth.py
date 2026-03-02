@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException
-from starlette.templating import Jinja2Templates
 
 from src.services.auth import AuthService
 from src.exceptions.auth import (
@@ -31,9 +30,7 @@ async def register_user(
 
 
 @router.post("/login")
-async def auth_user(
-    user_data: AuthUserSchema, auth_service: AuthService = Depends()
-):
+async def auth_user(user_data: AuthUserSchema, auth_service: AuthService = Depends()):
     try:
         result = await auth_service.login_user(user_data)
     except IncorrectEmailOrPasswordException:

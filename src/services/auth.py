@@ -1,15 +1,6 @@
-from datetime import datetime, timezone
-
-from fastapi import HTTPException, status, Depends
-from jose import jwt, JWTError
+from fastapi import Depends
 
 # from src.dependencies.auth import get_token
-from src.core.config import get_auth_data
-from src.exceptions.auth import (
-    TokenExpiredException,
-    NoUserIdException,
-    NoJwtException,
-)
 from src.exceptions.auth import IncorrectEmailOrPasswordException
 from src.db.repositories.user import UserRepository
 from src.exceptions.auth import UserAlreadyExistsException
@@ -48,6 +39,7 @@ class AuthService:
             "access_token": access_token,
             "user": BaseUserSchema.model_validate(user),
         }
+
     #
     # async def get_current_user(self, token: str = Depends(get_token)):
     #     try:

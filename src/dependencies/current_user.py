@@ -15,10 +15,12 @@ async def get_current_user_ws(websocket: WebSocket, db: AsyncSession):
         return
 
     try:
-        payload = jwt.decode(token, settings().SECRET_KEY, algorithms=[settings().ALGORITHM])
+        payload = jwt.decode(
+            token, settings().SECRET_KEY, algorithms=[settings().ALGORITHM]
+        )
 
         user_id: int = int(payload.get("sub"))
-    except JWTError as e:
+    except JWTError:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 

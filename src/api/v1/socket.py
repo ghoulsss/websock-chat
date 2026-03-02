@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, Depends, Request, Query
+from fastapi import APIRouter, WebSocket, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -45,13 +45,15 @@ async def chat_websocket(
         for msg in messages:
             name = msg.user.name if msg.user else f"User {msg.user_id}"
 
-            await websocket.send_json({
-                "id": msg.id,
-                "user_id": msg.user_id,
-                "name": name,
-                "content": msg.content,
-                "created_at": msg.created_at.isoformat(),
-            })
+            await websocket.send_json(
+                {
+                    "id": msg.id,
+                    "user_id": msg.user_id,
+                    "name": name,
+                    "content": msg.content,
+                    "created_at": msg.created_at.isoformat(),
+                }
+            )
 
         while True:
             data = await websocket.receive_json()
@@ -92,7 +94,6 @@ async def chat_websocket(
             logger.exception(f"Error for user {user.name}")
 
         manager.disconnect(websocket)
-
 
     finally:
         await session.close()

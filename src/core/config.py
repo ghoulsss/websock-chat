@@ -9,13 +9,13 @@ class Settings(BaseSettings):
     # root_dir: Path = Path(__file__).resolve().parent.parent.parent
     # src_dir: Path = root_dir.joinpath("src")
 
-    PROJECT_NAME: str = "websocket-chat-test"
+    PROJECT_NAME: str = "websocket-chat"
 
     USE_CORS_MIDDLEWARE: bool = True
 
     SERVER_HOST: str = "0.0.0.0"
     SERVER_PORT: int = 8000
-    # SERVER_WORKERS_COUNT: int = 5
+    SERVER_WORKERS_COUNT: int = 5
 
     ENVIRONMENT: str = "local"
     CORS_ALLOW_ORIGIN_LIST: str = "http://localhost:5173"

@@ -1,16 +1,54 @@
 services:
-  db:
-    image: postgres:15
-    container_name: postgres_db
+  webchat:
+    container_name: webchat
     restart: always
+    build:
+      context: ./src
+    working_dir: /websocket-chat/src
+    command: sh -c "
+        alembic upgrade head &&
+        python main.py
+      "
+    env_file: ./src/.env
+    networks:
+      - webchat-network
+#    ports:
+#      - ${SERVER_PORT}:${SERVER_PORT}
+    depends_on:
+      - webchat-db
+#    healthcheck:
+#      test: curl -f http://localhost:${SERVER_PORT}/api/healthcheck
+#      interval: 60s
+#      timeout: 3s
+#      retries: 3
+
+  webchat-db:
+    image: postgres:15
+    container_name: webchat-db
+    restart: always
+    command: -p ${POSTGRES_PORT}
     environment:
-      POSTGRES_DB: myapp_db
-      POSTGRES_USER: myapp_user
-      POSTGRES_PASSWORD: myapp_password
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
     ports:
-      - "5432:5432"
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    networks:
+      - webchat-network
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    expose:
+      - ${POSTGRES_PORT}
+    healthcheck:
+      test: pg_isready -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 60s
+      timeout: 3s
+      retries: 3
 
 volumes:
   postgres_data:
+
+networks:
+  webchat-network:
+    name: webchat

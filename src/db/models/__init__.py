@@ -1,7 +1,9 @@
 __all__ = (
     "User",
     "Message",
+    "BaseModel"
 )
 
-from src.db.models.messages import Message
-from src.db.models.users import User
+from db.models.base import BaseModel
+from db.models.messages import Message
+from db.models.users import User

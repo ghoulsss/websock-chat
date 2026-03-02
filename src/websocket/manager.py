@@ -1,6 +1,7 @@
 from typing import List
 from starlette.websockets import WebSocket
 
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: List[WebSocket] = []
@@ -25,5 +26,6 @@ class ConnectionManager:
 
         for conn in disconnected:
             self.disconnect(conn)
+
 
 manager = ConnectionManager()

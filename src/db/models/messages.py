@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, Text, ForeignKey, Boolean
+from sqlalchemy import Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.db.models.mixins import IDMixin, CreatedAtMixin, UpdatedAtMixin
