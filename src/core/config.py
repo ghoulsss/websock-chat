@@ -15,12 +15,11 @@ class Settings(BaseSettings):
 
     SERVER_HOST: str = "0.0.0.0"
     SERVER_PORT: int = 8000
-    SERVER_WORKERS_COUNT: int = 5
+    SERVER_WORKERS_COUNT: int = 2
 
-    ENVIRONMENT: str = "local"
-    CORS_ALLOW_ORIGIN_LIST: str = "http://0.0.0.0:5173"
+    CORS_ALLOW_ORIGIN_LIST: str = "*"#"http://0.0.0.0:5173"
 
-    POSTGRES_HOST: str = ""
+    POSTGRES_HOST: str = "webchat-db"
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str = "myapp_user"
     POSTGRES_PASSWORD: str = "myapp_password"
@@ -28,9 +27,7 @@ class Settings(BaseSettings):
 
     @functools.cached_property
     def postgres_dsn(self) -> str:
-        postgres_host = (
-            "localhost" if self.ENVIRONMENT == "local" else self.POSTGRES_HOST
-        )
+        postgres_host = self.POSTGRES_HOST
         return (
             f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
             f"{postgres_host}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"

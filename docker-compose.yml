@@ -12,8 +12,9 @@ services:
     env_file: ./src/.env
     networks:
       - webchat-network
-#    ports:
+    ports:
 #      - ${SERVER_PORT}:${SERVER_PORT}
+      - 8000:8000
     depends_on:
       - webchat-db
 #    healthcheck:
@@ -32,6 +33,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_PORT=${POSTGRES_HOST}
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     networks:
