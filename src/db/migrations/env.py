@@ -12,6 +12,7 @@ from core.config import settings
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+print(settings().postgres_dsn)
 config.set_main_option("sqlalchemy.url", settings().postgres_dsn)
 
 

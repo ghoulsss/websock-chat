@@ -54,3 +54,4 @@ volumes:
 networks:
   webchat-network:
     name: webchat
+    external: true

@@ -33,6 +33,12 @@ async def register_user(
 async def auth_user(user_data: AuthUserSchema, auth_service: AuthService = Depends()):
     try:
         result = await auth_service.login_user(user_data)
+        access_token = result["access_token"]
+
+        return {
+            "access_token": access_token,
+            "user": result["user"],
+        }
     except IncorrectEmailOrPasswordException:
         # raise IncorrectEmailOrPasswordException
         raise HTTPException(
@@ -41,9 +47,4 @@ async def auth_user(user_data: AuthUserSchema, auth_service: AuthService = Depen
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = result["access_token"]
 
-    return {
-        "access_token": access_token,
-        "user": result["user"],
-    }
