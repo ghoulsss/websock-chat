@@ -18,7 +18,7 @@ async def register_user(
     try:
         result = await auth_service.register_user(user_data)
     except ValueError:
-        raise PasswordMismatchException("Пароли не совпадают")
+        raise PasswordMismatchException
     except Exception:
         raise UserAlreadyExistsException
 
@@ -46,5 +46,3 @@ async def auth_user(user_data: AuthUserSchema, auth_service: AuthService = Depen
             detail="Неверный email или пароль",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-

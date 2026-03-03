@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from starlette.websockets import WebSocketDisconnect
-
+from typing import Optional
 from db.models import User, Message
 
 from db.session import get_session
@@ -21,10 +21,10 @@ async def chat_websocket(
     websocket: WebSocket,
     session: AsyncSession = Depends(get_session),
 ):
-    user = None
+    user: Optional[User] = None
 
     try:
-        user: User = await get_current_user_ws(websocket, session)
+        user = await get_current_user_ws(websocket, session)
 
         if not user:
             await websocket.close(code=1008)
@@ -40,7 +40,7 @@ async def chat_websocket(
             .limit(50)
         )
         messages = result.scalars().all()
-        messages.reverse()
+        # messages.reverse()
 
         for msg in messages:
             name = msg.user.name if msg.user else f"User {msg.user_id}"

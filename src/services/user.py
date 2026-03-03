@@ -1,7 +1,5 @@
 from typing import Sequence
-
-from fastapi import HTTPException
-from fastapi.params import Depends
+from fastapi import HTTPException, Depends
 from pydantic import EmailStr
 
 from db.repositories.user import UserRepository
@@ -21,7 +19,7 @@ class UserService:
         user = await self.user_repository.create_user(user_data, hashed_password)
         return user
 
-    async def get_user_by_id(self, user_id: int) -> BaseUserSchema | None:
+    async def get_user_by_id(self, user_id: int) -> BaseUserSchema:
         user = await self.user_repository.get_user_by_id(user_id)
 
         if not user:
@@ -29,13 +27,13 @@ class UserService:
 
         return user
 
-    async def get_user_by_email(self, email: EmailStr) -> BaseUserSchema | None:
+    async def get_user_by_email(self, email: EmailStr) -> BaseUserSchema:
         user = await self.user_repository.get_user_by_email(email)
 
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        return BaseUserSchema.model_validate(user) if user else None
+        return BaseUserSchema.model_validate(user)
 
     async def get_all_users(self) -> Sequence[BaseUserSchema]:
         return await self.user_repository.get_all_users()

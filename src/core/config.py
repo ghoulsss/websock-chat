@@ -4,8 +4,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
-    SECRET_KEY: str
-    ALGORITHM: str
+    SECRET_KEY: str = "1"
+    ALGORITHM: str = "HS256"
     # root_dir: Path = Path(__file__).resolve().parent.parent.parent
     # src_dir: Path = root_dir.joinpath("src")
 
@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     SERVER_PORT: int = 8000
     SERVER_WORKERS_COUNT: int = 2
 
-    CORS_ALLOW_ORIGIN_LIST: str = "*"#"http://0.0.0.0:5173"
+    CORS_ALLOW_ORIGIN_LIST: str = "*"  # "http://0.0.0.0:5173"
 
     POSTGRES_HOST: str = "webchat-db"
     POSTGRES_PORT: int = 5432
