@@ -3,25 +3,21 @@ services:
     container_name: webchat
     restart: always
     build:
-      context: ./src
-    working_dir: /websocket-chat/src
+      context: ./backend/src
+    working_dir: /websocket-chat/backend/src
     command: sh -c "
-        alembic upgrade head &&
-        python main.py
+      alembic upgrade head &&
+      python main.py
       "
     env_file: ./src/.env
     networks:
       - webchat-network
+    environment:
+      - SERVER_PORT=${SERVER_PORT}
     ports:
-#      - ${SERVER_PORT}:${SERVER_PORT}
-      - 8000:8000
+      - ${SERVER_PORT}:${SERVER_PORT}
     depends_on:
       - webchat-db
-#    healthcheck:
-#      test: curl -f http://localhost:${SERVER_PORT}/api/healthcheck
-#      interval: 60s
-#      timeout: 3s
-#      retries: 3
 
   webchat-db:
     image: postgres:15
@@ -56,16 +52,16 @@ services:
       dockerfile: Dockerfile
       target: development
     ports:
-      - "5173:5173"  # Vite dev server
-      - "4173:4173"  # Vite preview server
+      - "5173:5173" # Vite dev server
+      - "4173:4173" # Vite preview server
     volumes:
-      - ./frontend:/app  # монтируем код для hot-reload
-      - /app/node_modules  # сохраняем node_modules в контейнере
+      - ./frontend:/app # монтируем код для hot-reload
+      - /app/node_modules # сохраняем node_modules в контейнере
     environment:
       - VITE_API_URL=http://localhost:8000
       - VITE_WS_URL=ws://localhost:8000
-      - CHOKIDAR_USEPOLLING=true  # для hot-reload в Docker
-      - WATCHPACK_POLLING=true  # дополнительно для webpack/vite
+      - CHOKIDAR_USEPOLLING=true # для hot-reload в Docker
+      - WATCHPACK_POLLING=true # дополнительно для webpack/vite
     networks:
       - webchat-network
     depends_on:
