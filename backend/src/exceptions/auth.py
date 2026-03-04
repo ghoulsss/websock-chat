@@ -1,4 +1,5 @@
-from fastapi import status, HTTPException
+from fastapi import HTTPException, status
+from pydantic import HttpUrl
 
 
 class TokenExpiredException(HTTPException):
@@ -13,11 +14,9 @@ class TokenNoFoundException(HTTPException):
         )
 
 
-class IncorrectEmailOrPasswordException(HTTPException):
-    def __init__(self):
-        super().__init__(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверная почта или пароль"
-        )
+IncorrectEmailOrPasswordException = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверная почта или пароль"
+)
 
 
 UserAlreadyExistsException = HTTPException(
