@@ -1,17 +1,6 @@
 from fastapi import APIRouter, WebSocket, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-from starlette.websockets import WebSocketDisconnect
-from typing import Optional
-from db.models import User, Message
+from services.chat import ChatService
 
-from db.session import get_session
-from dependencies.current_user import get_current_user_ws
-from websocket.manager import manager
-import logging
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="", tags=["Websocket"])
 
@@ -19,81 +8,78 @@ router = APIRouter(prefix="", tags=["Websocket"])
 @router.websocket("/ws/chat")
 async def chat_websocket(
     websocket: WebSocket,
-    session: AsyncSession = Depends(get_session),
+    chat_service: ChatService = Depends(),
 ):
-    user: Optional[User] = None
+    return await chat_service.chat_websocket(websocket)
 
-    try:
-        user = await get_current_user_ws(websocket, session)
 
-        if not user:
-            await websocket.close(code=1008)
-            return
+# @router.websocket("/ws/chat")
+# async def chat_websocket(
+#     websocket: WebSocket,
+#     session: AsyncSession = Depends(get_session),
+#     auth_service: AuthService = Depends(),
+#     messages_repo: MessagesRepository = Depends(),
+# ):
+#     user: User | None = None
 
-        await manager.connect(websocket)
-        logger.info(f"User {user.name} (ID: {user.id}) connected to chat")
+#     try:
+#         user = await auth_service.get_current_user_ws(websocket, session)
 
-        result = await session.execute(
-            select(Message)
-            .options(selectinload(Message.user))
-            .order_by(Message.created_at.desc())
-            .limit(50)
-        )
-        messages = result.scalars().all()
-        # messages.reverse()
+#         if not user:
+#             await websocket.close(code=1008)
+#             return
 
-        for msg in messages:
-            name = msg.user.name if msg.user else f"User {msg.user_id}"
+#         await manager.connect(websocket)
+#         logger.info(f"User {user.name} (ID: {user.id}) connected to chat")
 
-            await websocket.send_json(
-                {
-                    "id": msg.id,
-                    "user_id": msg.user_id,
-                    "name": name,
-                    "content": msg.content,
-                    "created_at": msg.created_at.isoformat(),
-                }
-            )
+#         messages = await messages_repo.get_last_messages()
 
-        while True:
-            data = await websocket.receive_json()
-            content = data.get("content", "").strip()
+#         for msg in messages:
+#             name = msg.user.name if msg.user else f"User {msg.user_id}"
 
-            if not content:
-                continue
+#             await websocket.send_json(
+#                 {
+#                     "id": msg.id,
+#                     "user_id": msg.user_id,
+#                     "name": name,
+#                     "content": msg.content,
+#                     "created_at": msg.created_at,
+#                 }
+#             )
 
-            new_message = Message(
-                user_id=user.id,
-                content=content,
-            )
-            session.add(new_message)
-            await session.commit()
-            await session.refresh(new_message)
+#         while True:
+#             data = await websocket.receive_json()
+#             content = data.get("content", "").strip()
 
-            message_data = {
-                "id": new_message.id,
-                "user_id": user.id,
-                "name": user.name,
-                "content": new_message.content,
-                "created_at": new_message.created_at.isoformat(),
-            }
+#             if not content:
+#                 continue
 
-            await manager.broadcast(message_data)
-            logger.info(f"Message from {user.name} broadcasted: {content[:30]}...")
+#             new_message = await messages_repo.create_message(user_id=user.id, content=content)
 
-    except WebSocketDisconnect:
-        if user:
-            logger.info(f"User {user.name} disconnected from chat")
+#             message_data = {
+#                 "id": new_message.id,
+#                 "user_id": user.id,
+#                 "name": user.name,
+#                 "content": new_message.content,
+#                 "created_at": new_message.created_at.isoformat(),
+#             }
 
-        manager.disconnect(websocket)
+#             await manager.broadcast(message_data)
+#             # logger.info(f"Message from {user.name} broadcasted: {content[:30]}...")
 
-    except Exception as e:
-        logger.error(f"WebSocket error: {e}")
+#     except WebSocketDisconnect:
+#         if user:
+#             logger.info(f"User {user.name} disconnected from chat")
 
-        if user:
-            logger.exception(f"Error for user {user.name}")
+#         manager.disconnect(websocket)
 
-        manager.disconnect(websocket)
+#     except Exception as e:
+#         logger.error(f"WebSocket error: {e}")
 
-    finally:
-        await session.close()
+#         if user:
+#             logger.exception(f"Error for user {user.name}")
+
+#         manager.disconnect(websocket)
+
+#     finally:
+#         await session.close()

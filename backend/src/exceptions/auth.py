@@ -1,5 +1,4 @@
 from fastapi import HTTPException, status
-from pydantic import HttpUrl
 
 
 class TokenExpiredException(HTTPException):

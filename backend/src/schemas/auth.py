@@ -1,13 +1,13 @@
-from pydantic import EmailStr, Field
+from pydantic import Field
 from schemas.base import BaseSchema
+from schemas.user import GetUserEmailSchema, GetUserSchema
 
-
-class RegisterUserSchema(BaseSchema):
+class BaseAuthUserSchema(BaseSchema):
     access_token: str = Field(..., description="Токен")
-    user: dict = Field(
-        ..., description="Данные пользователя"
-    )
+
+class RegisterUserSchema(BaseAuthUserSchema):
+    user: GetUserSchema
 
 
-class LoginUserSchema(RegisterUserSchema):
-    ...
+class LoginUserSchema(BaseAuthUserSchema):
+    user: GetUserEmailSchema

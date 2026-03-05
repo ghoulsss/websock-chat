@@ -9,7 +9,7 @@ services:
       alembic upgrade head &&
       python main.py
       "
-    env_file: ./src/.env
+    env_file: ./backend/src/.env
     networks:
       - webchat-network
     environment:

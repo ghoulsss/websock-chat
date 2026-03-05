@@ -1,6 +1,6 @@
 FROM python:3.12-alpine
 
-WORKDIR /websocket-chat/src
+WORKDIR /websocket-chat/backend/src
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \

@@ -28,7 +28,16 @@ class BaseUserSchema(BaseSchema):
     email: EmailStr
 
 
+class GetUserSchema(BaseUserSchema): ...
+
+
 class UpdateUserSchema(BaseSchema):
     name: str | None = None
     email: EmailStr | None = None
     password: str | None = None
+
+
+class GetUserEmailSchema(BaseSchema):
+    id: int
+    email: EmailStr
+    hashed_password: str
