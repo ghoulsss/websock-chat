@@ -1,13 +1,10 @@
 from fastapi import Depends, WebSocket
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.repositories.messages import MessagesRepository
 from schemas.user import GetUserSchema
 from services.auth import AuthService
-from db.session import get_session
 
 from starlette.websockets import WebSocketDisconnect
-from db.models import User
 from websocket.manager import manager
 import logging
 
@@ -89,7 +86,6 @@ class ChatService:
                 logger.exception(f"Error for user {user.name}")
 
             manager.disconnect(websocket)
-
 
     ########################################################################################
     # ########################################################################################

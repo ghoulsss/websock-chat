@@ -17,7 +17,7 @@ class UserRepository(BaseDatabaseRepository):
         self, user_data: CreateUserSchema, hashed_password: str
     ) -> GetUserSchema:
         user_dict = user_data.model_dump(exclude={"password", "password_check"})
-        user_dict['hashed_password'] = hashed_password
+        user_dict["hashed_password"] = hashed_password
 
         query = insert(User).values(user_dict).returning(User)
         result = await self._session.execute(query)

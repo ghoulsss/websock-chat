@@ -1,11 +1,7 @@
 from fastapi import Depends, WebSocket, status
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt, JWTError
 from core.config import settings
-from db.models import User
 from db.repositories.user import UserRepository
-from db.session import get_session
 from exceptions.auth import (
     IncorrectEmailOrPasswordException,
     PasswordMismatchException,
@@ -18,8 +14,11 @@ from utils.auth import create_access_token, get_password_hash, verify_password
 
 
 class AuthService:
-    def __init__(self, user_repository: UserRepository = Depends(),
-                 user_service: UserService = Depends()) -> None:
+    def __init__(
+        self,
+        user_repository: UserRepository = Depends(),
+        user_service: UserService = Depends(),
+    ) -> None:
         self._user_repository = user_repository
         self._user_service = user_service
 
@@ -36,7 +35,9 @@ class AuthService:
                 raise UserAlreadyExistsException
 
             hashed_password = get_password_hash(user_data.password)
-            user = await self._user_repository.create_user(user_data, hashed_password=hashed_password)
+            user = await self._user_repository.create_user(
+                user_data, hashed_password=hashed_password
+            )
 
             access_token = create_access_token({"sub": str(user.id)})
 
@@ -46,7 +47,7 @@ class AuthService:
 
         except ValueError:
             raise PasswordMismatchException
-        except Exception as e:
+        except Exception:
             raise Exception("Registration failed due to internal error")
 
     async def login_user(self, auth_data: AuthUserSchema) -> LoginUserSchema:
@@ -66,7 +67,8 @@ class AuthService:
             raise Exception
 
     async def get_current_user_ws(
-        self, websocket: WebSocket,
+        self,
+        websocket: WebSocket,
     ) -> GetUserSchema | None:
         token = websocket.query_params.get("access_token")
 

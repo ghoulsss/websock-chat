@@ -1,5 +1,4 @@
 from typing import Sequence
-from xxlimited import new
 from sqlalchemy import insert, select
 from sqlalchemy.orm import selectinload
 
@@ -9,9 +8,7 @@ from schemas.message import GetMessageSchema
 
 
 class MessagesRepository(BaseDatabaseRepository):
-    async def get_last_messages(
-        self, limit: int = 50
-    ) -> Sequence[GetMessageSchema]:
+    async def get_last_messages(self, limit: int = 50) -> Sequence[GetMessageSchema]:
         query = (
             select(Message)
             .options(selectinload(Message.user))
@@ -21,21 +18,25 @@ class MessagesRepository(BaseDatabaseRepository):
 
         result = await self._session.execute(query)
 
-        return [GetMessageSchema.model_validate(user) for user in result.scalars().all()][::-1]
+        return [
+            GetMessageSchema.model_validate(user) for user in result.scalars().all()
+        ][::-1]
 
     async def create_message(self, user_id: int, content: str) -> GetMessageSchema:
         query = (
-            insert(Message).values(user_id=user_id, content=content).returning(Message.id)
+            insert(Message)
+            .values(user_id=user_id, content=content)
+            .returning(Message.id)
         )
 
         result = await self._session.execute(query)
         new_message = result.scalar_one()
 
         select_query = (
-                select(Message)
-                .options(selectinload(Message.user))
-                .where(Message.id == new_message)
-            )
+            select(Message)
+            .options(selectinload(Message.user))
+            .where(Message.id == new_message)
+        )
         select_result = await self._session.execute(select_query)
         new_message = select_result.scalar_one()
 
