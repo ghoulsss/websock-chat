@@ -70,9 +70,8 @@ class ChatService:
                     "user_id": user.id,
                     "name": user.name,
                     "content": new_message.content,
-                    "created_at": new_message.created_at,
+                    "created_at": new_message.created_at.isoformat(),
                 }
-                print(message_data)
 
                 await manager.broadcast(message_data)
                 logger.info(f"Message from {user.name} broadcasted: {content[:30]}...")
