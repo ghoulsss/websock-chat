@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from api.router import v1_router
+from api.router import api_router
 from core.config import settings
 from exceptions.auth import TokenNoFoundException, TokenExpiredException
 from core.middlewares import middleware
@@ -15,7 +15,7 @@ app = FastAPI(
     middleware=middleware,
 )
 
-app.include_router(v1_router)
+app.include_router(api_router)
 
 
 @app.exception_handler(TokenExpiredException)

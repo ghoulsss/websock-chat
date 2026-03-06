@@ -15,7 +15,7 @@ export default function Chat({ token, user, onLogout }: Props) {
   useEffect(() => {
     if (!token) return;
     
-    const ws = new WebSocket(`ws://localhost:8000/ws/chat?access_token=${token}`);
+    const ws = new WebSocket(`ws://localhost:8000/api/websocket-chat/v1/ws/chat?access_token=${token}`);
 
     ws.onopen = () => console.log("WebSocket connected");
     ws.onmessage = (event) => console.log("Message:", event.data);
