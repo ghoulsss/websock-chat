@@ -40,6 +40,3 @@ class MessagesRepository(BaseDatabaseRepository):
         new_message = select_result.scalar_one()
 
         return GetMessageSchema.model_validate(new_message)
-        # await self._session.refresh(new_message, attribute_names=["user"])
-
-        # return GetMessageSchema.model_validate(new_message)

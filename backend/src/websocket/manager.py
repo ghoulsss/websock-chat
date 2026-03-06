@@ -1,5 +1,5 @@
 from typing import List
-from starlette.websockets import WebSocket
+from fastapi.websockets import WebSocket
 
 
 class ConnectionManager:

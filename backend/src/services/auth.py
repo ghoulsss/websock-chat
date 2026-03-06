@@ -47,9 +47,6 @@ class AuthService:
         except ValueError:
             raise PasswordMismatchException
         except Exception as e:
-            # Логируем неожиданную ошибку и выбрасываем общее исключение
-            print(f"Unexpected error during registration: {e}")
-            # Здесь лучше выбросить другое исключение, например InternalServerError
             raise Exception("Registration failed due to internal error")
 
     async def login_user(self, auth_data: AuthUserSchema) -> LoginUserSchema:
@@ -70,7 +67,6 @@ class AuthService:
 
     async def get_current_user_ws(
         self, websocket: WebSocket,
-        # session: AsyncSession = Depends(get_session)
     ) -> GetUserSchema | None:
         token = websocket.query_params.get("access_token")
 
@@ -89,8 +85,6 @@ class AuthService:
             return None
 
         user = await self._user_service.get_user_by_id(user_id=int(user_id))
-        # result = await session.execute(select(User).filter(User.id == user_id))
-        # user = result.scalar_one_or_none()
 
         if not user:
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
