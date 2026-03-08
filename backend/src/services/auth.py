@@ -80,13 +80,18 @@ class AuthService:
             payload = jwt.decode(
                 token, settings().SECRET_KEY, algorithms=[settings().ALGORITHM]
             )
-
             user_id = payload.get("sub")
+
+            if user_id is None:
+                await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+                return None
+
+            user_id_int = int(user_id)
         except JWTError:
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
             return None
 
-        user = await self._user_service.get_user_by_id(user_id=int(user_id))
+        user = await self._user_service.get_user_by_id(user_id=user_id_int)
 
         if not user:
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)

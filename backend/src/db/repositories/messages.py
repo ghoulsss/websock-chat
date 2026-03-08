@@ -30,12 +30,12 @@ class MessagesRepository(BaseDatabaseRepository):
         )
 
         result = await self._session.execute(query)
-        new_message = result.scalar_one()
+        new_message_id = result.scalar_one()
 
         select_query = (
             select(Message)
             .options(selectinload(Message.user))
-            .where(Message.id == new_message)
+            .where(Message.id == new_message_id)
         )
         select_result = await self._session.execute(select_query)
         new_message = select_result.scalar_one()
