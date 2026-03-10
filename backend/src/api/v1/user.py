@@ -8,7 +8,7 @@ from schemas.user import CreateUserSchema
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.post("", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=None)
 async def create_user(
     user_data: CreateUserSchema, user_service: UserService = Depends()
 ):
@@ -29,16 +29,16 @@ async def get_all_users(
     return await user_service.get_all_users()
 
 
-@router.patch("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def update_user(
+@router.patch("/{user_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
+async def update_user_by_id(
     user_id: int, update_data: UpdateUserSchema, service: UserService = Depends()
 ) -> None:
-    return await service.update_user(
+    return await service.update_user_by_id(
         user_id=user_id,
         update_data=update_data,
     )
 
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_user_by_id(user_id: int, service: UserService = Depends()) -> None:
     await service.delete_user_by_id(user_id=user_id)

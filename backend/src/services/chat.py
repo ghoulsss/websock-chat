@@ -27,7 +27,7 @@ class ChatService:
         user = None
 
         try:
-            user = await self.auth_service.get_current_user_ws(websocket)
+            user = await self.auth_service.get_current_user_ws(websocket=websocket)
 
             if not user:
                 await websocket.close(code=1008)
@@ -86,33 +86,3 @@ class ChatService:
                 logger.exception(f"Error for user {user.name}")
 
             manager.disconnect(websocket)
-
-    ########################################################################################
-    # ########################################################################################
-    async def get_recent_messages(self) -> list[dict]:
-        messages = await self.message_repository.get_last_messages()
-
-        result = []
-        for msg in messages:
-            name = msg.user.name if msg.user else f"User {msg.user_id}"
-            result.append(
-                {
-                    "id": msg.id,
-                    "user_id": msg.user_id,
-                    "name": name,
-                    "content": msg.content,
-                    "created_at": msg.created_at,
-                }
-            )
-        return result
-
-    async def process_message(self, user: GetUserSchema, content: str) -> dict:
-        new_message = await self.message_repository.create_message(user.id, content)
-
-        return {
-            "id": new_message.id,
-            "user_id": user.id,
-            "name": user.name,
-            "content": new_message.content,
-            "created_at": new_message.created_at,
-        }

@@ -10,4 +10,4 @@ async def chat_websocket(
     websocket: WebSocket,
     chat_service: ChatService = Depends(),
 ):
-    return await chat_service.chat_websocket(websocket)
+    return await chat_service.chat_websocket(websocket=websocket)

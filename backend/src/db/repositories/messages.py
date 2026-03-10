@@ -12,7 +12,7 @@ class MessagesRepository(BaseDatabaseRepository):
         query = (
             select(Message)
             .options(selectinload(Message.user))
-            .order_by(Message.created_at.desc())
+            .order_by(Message.created_at.asc())
             .limit(limit)
         )
 
@@ -20,7 +20,7 @@ class MessagesRepository(BaseDatabaseRepository):
 
         return [
             GetMessageSchema.model_validate(user) for user in result.scalars().all()
-        ][::-1]
+        ]
 
     async def create_message(self, user_id: int, content: str) -> GetMessageSchema:
         query = (

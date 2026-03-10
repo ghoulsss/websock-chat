@@ -1,5 +1,6 @@
 from typing import Sequence
 
+from pydantic import EmailStr
 from sqlalchemy import delete, insert, select, update
 
 from db.repositories.base import BaseDatabaseRepository
@@ -33,7 +34,7 @@ class UserRepository(BaseDatabaseRepository):
 
         return GetUserSchema.model_validate(user) if user else None
 
-    async def get_user_by_email(self, email: str) -> GetUserEmailSchema | None:
+    async def get_user_by_email(self, email: EmailStr) -> GetUserEmailSchema | None:
         query = select(User).filter(User.email == email)
 
         result = await self._session.execute(query)

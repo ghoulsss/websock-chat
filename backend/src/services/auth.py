@@ -23,48 +23,40 @@ class AuthService:
         self._user_service = user_service
 
     async def register_user(self, user_data: CreateUserSchema) -> RegisterUserSchema:
-        try:
-            if user_data.password != user_data.password_check:
-                raise ValueError("Passwords do not match")
-
-            existing_user = await self._user_repository.get_user_by_email(
-                email=user_data.email
-            )
-            print(existing_user)
-            if existing_user:
-                raise UserAlreadyExistsException
-
-            hashed_password = get_password_hash(user_data.password)
-            user = await self._user_repository.create_user(
-                user_data, hashed_password=hashed_password
-            )
-
-            access_token = create_access_token({"sub": str(user.id)})
-
-            return RegisterUserSchema.model_validate(
-                {"access_token": access_token, "user": user}
-            )
-
-        except ValueError:
+        if user_data.password != user_data.password_check:
             raise PasswordMismatchException
-        except Exception:
-            raise Exception("Registration failed due to internal error")
+
+        existing_user = await self._user_repository.get_user_by_email(
+            email=user_data.email
+        )
+
+        if existing_user:
+            raise UserAlreadyExistsException
+
+        hashed_password = get_password_hash(user_data.password)
+        user = await self._user_repository.create_user(
+            user_data, hashed_password=hashed_password
+        )
+
+        access_token = create_access_token({"sub": str(user.id)})
+
+        return RegisterUserSchema.model_validate(
+            {"access_token": access_token, "user": user}
+        )
+
 
     async def login_user(self, auth_data: AuthUserSchema) -> LoginUserSchema:
-        try:
-            user = await self._user_repository.get_user_by_email(auth_data.email)
-            if not user or not verify_password(
-                auth_data.password, user.hashed_password
-            ):
-                raise IncorrectEmailOrPasswordException
+        user = await self._user_repository.get_user_by_email(auth_data.email)
+        if not user or not verify_password(
+            auth_data.password, user.hashed_password
+        ):
+            raise IncorrectEmailOrPasswordException
 
-            access_token = create_access_token({"sub": str(user.id)})
+        access_token = create_access_token({"sub": str(user.id)})
 
-            return LoginUserSchema.model_validate(
-                {"access_token": access_token, "user": user}
-            )
-        except Exception:
-            raise Exception
+        return LoginUserSchema.model_validate(
+            {"access_token": access_token, "user": user}
+        )
 
     async def get_current_user_ws(
         self,
