@@ -34,7 +34,7 @@ class AuthService:
         if not user or not verify_password(auth_data.password, user.hashed_password):
             raise IncorrectEmailOrPasswordException
 
-        access_token = create_access_token({"sub": str(user.id)})
+        access_token = create_access_token(data={"sub": str(user.id)})
 
         return LoginUserSchema.model_validate(
             {"access_token": access_token, "user": user}
