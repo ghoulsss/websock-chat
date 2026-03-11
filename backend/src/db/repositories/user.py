@@ -5,18 +5,16 @@ from sqlalchemy import delete, insert, select, update
 
 from db.repositories.base import BaseDatabaseRepository
 from schemas.user import (
-    CreateUserSchema,
     GetUserEmailSchema,
     GetUserSchema,
-    UpdateUserSchema, CreateUserRepositorySchema,
+    UpdateUserSchema,
+    CreateUserRepositorySchema,
 )
 from db.models import User
 
 
 class UserRepository(BaseDatabaseRepository):
-    async def create_user(
-        self, data: CreateUserRepositorySchema
-    ) -> GetUserSchema:
+    async def create_user(self, data: CreateUserRepositorySchema) -> GetUserSchema:
         query = insert(User).values(**data.model_dump()).returning(User)
         result = await self._session.execute(query)
         new_user = result.scalar_one()

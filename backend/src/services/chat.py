@@ -8,7 +8,6 @@ from starlette.websockets import WebSocketDisconnect
 from websocket.manager import manager
 
 
-
 class ChatService:
     def __init__(
         self,
@@ -35,16 +34,18 @@ class ChatService:
 
             messages = await self.message_repository.get_last_messages()
 
-            messages_data = jsonable_encoder([
-                SendMessageSchema(
-                    id=msg.id,
-                    user_id=msg.user_id,
-                    name=msg.user.name,
-                    content=msg.content,
-                    created_at=msg.created_at,
-                ).model_dump()
-            for msg in messages
-            ])
+            messages_data = jsonable_encoder(
+                [
+                    SendMessageSchema(
+                        id=msg.id,
+                        user_id=msg.user_id,
+                        name=msg.user.name,
+                        content=msg.content,
+                        created_at=msg.created_at,
+                    ).model_dump()
+                    for msg in messages
+                ]
+            )
 
             await websocket.send_json(messages_data)
 

@@ -4,13 +4,11 @@ from core.config import settings
 from db.repositories.user import UserRepository
 from exceptions.auth import (
     IncorrectEmailOrPasswordException,
-    PasswordMismatchException,
-    UserAlreadyExistsException,
 )
 from schemas.auth import LoginUserSchema, RegisterUserSchema
 from schemas.user import AuthUserSchema, CreateUserSchema, GetUserSchema
 from services.user import UserService
-from utils.auth import create_access_token, get_password_hash, verify_password
+from utils.auth import create_access_token, verify_password
 
 
 class AuthService:
@@ -31,12 +29,9 @@ class AuthService:
             {"access_token": access_token, "user": user}
         )
 
-
     async def login_user(self, auth_data: AuthUserSchema) -> LoginUserSchema:
         user = await self._user_repository.get_user_by_email(auth_data.email)
-        if not user or not verify_password(
-            auth_data.password, user.hashed_password
-        ):
+        if not user or not verify_password(auth_data.password, user.hashed_password):
             raise IncorrectEmailOrPasswordException
 
         access_token = create_access_token({"sub": str(user.id)})

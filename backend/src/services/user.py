@@ -4,7 +4,12 @@ from pydantic import EmailStr
 
 from db.repositories.user import UserRepository
 from exceptions.auth import PasswordMismatchException, UserAlreadyExistsException
-from schemas.user import CreateUserSchema, GetUserSchema, UpdateUserSchema, CreateUserRepositorySchema
+from schemas.user import (
+    CreateUserSchema,
+    GetUserSchema,
+    UpdateUserSchema,
+    CreateUserRepositorySchema,
+)
 from utils.auth import get_password_hash
 
 
@@ -55,7 +60,9 @@ class UserService:
     async def get_all_users(self) -> Sequence[GetUserSchema]:
         return await self._user_repository.get_all_users()
 
-    async def update_user_by_id(self, user_id: int, update_data: UpdateUserSchema) -> None:
+    async def update_user_by_id(
+        self, user_id: int, update_data: UpdateUserSchema
+    ) -> None:
         user = await self.get_user_by_id(user_id)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
