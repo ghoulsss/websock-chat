@@ -8,19 +8,16 @@ from schemas.user import (
     CreateUserSchema,
     GetUserEmailSchema,
     GetUserSchema,
-    UpdateUserSchema,
+    UpdateUserSchema, CreateUserRepositorySchema,
 )
 from db.models import User
 
 
 class UserRepository(BaseDatabaseRepository):
     async def create_user(
-        self, user_data: CreateUserSchema, hashed_password: str
+        self, data: CreateUserRepositorySchema
     ) -> GetUserSchema:
-        user_dict = user_data.model_dump(exclude={"password", "password_check"})
-        user_dict["hashed_password"] = hashed_password
-
-        query = insert(User).values(user_dict).returning(User)
+        query = insert(User).values(**data.model_dump()).returning(User)
         result = await self._session.execute(query)
         new_user = result.scalar_one()
 

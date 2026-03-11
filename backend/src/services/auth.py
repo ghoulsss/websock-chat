@@ -23,22 +23,9 @@ class AuthService:
         self._user_service = user_service
 
     async def register_user(self, user_data: CreateUserSchema) -> RegisterUserSchema:
-        if user_data.password != user_data.password_check:
-            raise PasswordMismatchException
+        user = await self._user_service.create_user(user_data=user_data)
 
-        existing_user = await self._user_repository.get_user_by_email(
-            email=user_data.email
-        )
-
-        if existing_user:
-            raise UserAlreadyExistsException
-
-        hashed_password = get_password_hash(user_data.password)
-        user = await self._user_repository.create_user(
-            user_data, hashed_password=hashed_password
-        )
-
-        access_token = create_access_token({"sub": str(user.id)})
+        access_token = create_access_token(data={"sub": str(user.id)})
 
         return RegisterUserSchema.model_validate(
             {"access_token": access_token, "user": user}

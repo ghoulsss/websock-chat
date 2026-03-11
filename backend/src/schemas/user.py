@@ -21,6 +21,11 @@ class AuthUserSchema(BaseSchema):
         ..., min_length=5, max_length=30, description="Пароль, от 5 до 30 знаков"
     )
 
+class CreateUserRepositorySchema(BaseSchema):
+    email: EmailStr
+    hashed_password: str
+    name: str
+
 
 class BaseUserSchema(BaseSchema):
     id: int
