@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from api.v1.auth import router as auth_router
-from api.v1.socket import router as socket_router
+from api.v1.websocket import router as socket_router
 from api.v1.user import router as user_router
 from core.config import settings
 

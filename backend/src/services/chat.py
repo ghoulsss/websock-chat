@@ -1,14 +1,12 @@
 from fastapi import Depends, WebSocket
+from fastapi.encoders import jsonable_encoder
 
 from db.repositories.messages import MessagesRepository
-from schemas.user import GetUserSchema
+from schemas.message import SendMessageSchema
 from services.auth import AuthService
-
 from starlette.websockets import WebSocketDisconnect
 from websocket.manager import manager
-import logging
 
-logger = logging.getLogger(__name__)
 
 
 class ChatService:
@@ -34,22 +32,21 @@ class ChatService:
                 return
 
             await manager.connect(websocket)
-            logger.info(f"User {user.name} (ID: {user.id}) connected to chat")
 
             messages = await self.message_repository.get_last_messages()
 
-            for msg in messages:
-                name = msg.user.name if msg.user else f"User {msg.user_id}"
+            messages_data = jsonable_encoder([
+                SendMessageSchema(
+                    id=msg.id,
+                    user_id=msg.user_id,
+                    name=msg.user.name,
+                    content=msg.content,
+                    created_at=msg.created_at,
+                ).model_dump()
+            for msg in messages
+            ])
 
-                await websocket.send_json(
-                    {
-                        "id": msg.id,
-                        "user_id": msg.user_id,
-                        "name": name,
-                        "content": msg.content,
-                        "created_at": msg.created_at.isoformat(),
-                    }
-                )
+            await websocket.send_json(messages_data)
 
             while True:
                 data = await websocket.receive_json()
@@ -62,27 +59,15 @@ class ChatService:
                     user_id=user.id, content=content
                 )
 
-                message_data = {
-                    "id": new_message.id,
-                    "user_id": user.id,
-                    "name": user.name,
-                    "content": new_message.content,
-                    "created_at": new_message.created_at.isoformat(),
-                }
+                message_obj = SendMessageSchema(
+                    id=new_message.id,
+                    user_id=user.id,
+                    name=user.name,
+                    content=new_message.content,
+                    created_at=new_message.created_at,
+                )
 
-                await manager.broadcast(message_data)
-                logger.info(f"Message from {user.name} broadcasted: {content[:30]}...")
+                await manager.broadcast(jsonable_encoder(message_obj.model_dump()))
 
         except WebSocketDisconnect:
-            if user:
-                logger.info(f"User {user.name} disconnected from chat")
-
-            manager.disconnect(websocket)
-
-        except Exception as e:
-            logger.error(f"WebSocket error: {e}")
-
-            if user:
-                logger.exception(f"Error for user {user.name}")
-
             manager.disconnect(websocket)

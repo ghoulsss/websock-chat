@@ -11,21 +11,24 @@ export default function Chat({ token, user, onLogout }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const socketRef = useRef<WebSocket | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     if (!token) return;
     
     const ws = new WebSocket(`ws://localhost:8000/api/websocket-chat/v1/ws/chat?access_token=${token}`);
 
-    ws.onopen = () => console.log("WebSocket connected");
-    ws.onmessage = (event) => console.log("Message:", event.data);
-    ws.onclose = (event) => console.log("WebSocket closed", event.code);
-    ws.onerror = (err) => console.error("WebSocket error", err);
-    
     ws.onmessage = (event) => {
       try {
-        const data: Message = JSON.parse(event.data);
-        setMessages((prev) => [...prev, data]);
+        const data: Message | Message[] = JSON.parse(event.data);
+
+        if (Array.isArray(data)) {
+            setMessages(data);
+
+        } else {
+          setMessages((prev) => [...prev, data]);
+        }
       } catch (err) {
         console.error("Error parsing message:", err);
       }
@@ -36,6 +39,14 @@ export default function Chat({ token, user, onLogout }: Props) {
       ws.close();
     };
   }, [token]);
+
+  useEffect(() => {
+  const timeout = setTimeout(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, 0);
+
+      return () => clearTimeout(timeout);
+    }, [messages]);
 
   const sendMessage = () => {
     if (!socketRef.current || !input.trim()) return;
@@ -72,6 +83,7 @@ export default function Chat({ token, user, onLogout }: Props) {
             <small>{new Date(msg.created_at).toLocaleTimeString()}</small>
           </div>
         ))}
+          <div ref={messagesEndRef} />
       </div>
 
       <div style={{ marginTop: 10 }}>
