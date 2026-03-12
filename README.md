@@ -1,4 +1,4 @@
-# its-grade
+# websock-chat
 
 Клонирование репозитория:
 ``` Bash
@@ -39,8 +39,5 @@ poetry run py main.py
 ``` Bash
 poetry run ruff check --fix
 poetry run ruff format
-
-[//]: # (poetry run mypy .)
+poetry run mypy .
 ```
-# weboscket-chat
-# websock-chat
