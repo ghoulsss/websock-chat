@@ -1,9 +1,13 @@
 from typing import Sequence
-from fastapi import HTTPException, Depends
+from fastapi import Depends
 from pydantic import EmailStr
 
 from db.repositories.user import UserRepository
-from exceptions.auth import PasswordMismatchException, UserAlreadyExistsException
+from exceptions.auth import (
+    PasswordMismatchException,
+    UserAlreadyExistsException,
+    UserNotFoundException,
+)
 from schemas.user import (
     CreateUserSchema,
     GetUserSchema,
@@ -24,17 +28,11 @@ class UserService:
         if user_data.password != user_data.password_check:
             raise PasswordMismatchException
 
-        existing_user = await self._user_repository.get_user_by_email(
-            email=user_data.email
-        )
-
-        if existing_user:
+        if await self._user_repository.get_user_by_email(email=user_data.email):
             raise UserAlreadyExistsException
 
-        hashed_password = get_password_hash(password=user_data.password)
-
         data = user_data.model_dump(exclude={"password", "password_check"})
-        data["hashed_password"] = hashed_password
+        data["hashed_password"] = get_password_hash(password=user_data.password)
 
         user = await self._user_repository.create_user(
             data=CreateUserRepositorySchema.model_validate(data)
@@ -45,7 +43,7 @@ class UserService:
         user = await self._user_repository.get_user_by_id(user_id=user_id)
 
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise UserNotFoundException
 
         return user
 
@@ -53,7 +51,7 @@ class UserService:
         user = await self._user_repository.get_user_by_email(email)
 
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise UserNotFoundException
 
         return GetUserSchema.model_validate(user)
 
@@ -63,9 +61,8 @@ class UserService:
     async def update_user_by_id(
         self, user_id: int, update_data: UpdateUserSchema
     ) -> None:
-        user = await self.get_user_by_id(user_id)
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+        if not await self.get_user_by_id(user_id):
+            raise UserNotFoundException
 
         kwargs = update_data.model_dump(exclude_unset=True)
 

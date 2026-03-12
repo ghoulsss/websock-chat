@@ -25,3 +25,5 @@ UserAlreadyExistsException = HTTPException(
 PasswordMismatchException = HTTPException(
     status_code=status.HTTP_409_CONFLICT, detail="Пароли не совпадают!"
 )
+
+UserNotFoundException = HTTPException(status_code=404, detail="User not found")

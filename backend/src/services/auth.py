@@ -31,7 +31,9 @@ class AuthService:
 
     async def login_user(self, auth_data: AuthUserSchema) -> LoginUserSchema:
         user = await self._user_repository.get_user_by_email(auth_data.email)
-        if not user or not verify_password(auth_data.password, user.hashed_password):
+        if not user or not verify_password(
+            plain_password=auth_data.password, hashed_password=user.hashed_password
+        ):
             raise IncorrectEmailOrPasswordException
 
         access_token = create_access_token(data={"sub": str(user.id)})
@@ -60,12 +62,11 @@ class AuthService:
                 await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
                 return None
 
-            user_id_int = int(user_id)
         except JWTError:
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
             return None
 
-        user = await self._user_service.get_user_by_id(user_id=user_id_int)
+        user = await self._user_service.get_user_by_id(user_id=int(user_id))
 
         if not user:
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
